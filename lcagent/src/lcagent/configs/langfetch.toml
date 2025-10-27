@@ -1,0 +1,27 @@
+[logging_configs]
+version = 1
+
+[logging_configs.formatters.detailedFormatter]
+format = "%(asctime)s - %(name)s - %(filename)s:%(lineno)d - %(levelname)s - %(message)s"
+datefmt = "%Y-%m-%d %H:%M:%S"
+
+[logging_configs.handlers.fileHandler]
+class = "logging.handlers.RotatingFileHandler"
+level = "DEBUG"
+formatter = "detailedFormatter"
+filename = "log/runtime.log"
+maxBytes = 262144
+backupCount = 4
+
+[logging_configs.loggers.root]
+level = "DEBUG"
+handlers = ["fileHandler"]
+propagate = false
+
+[supported]
+english = "en-us"
+simplified_chinese = "zh-cn"
+
+[groups.test0]
+en-us = "This is a test."
+zh-cn = "这是一个测试。"
