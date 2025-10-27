@@ -7,26 +7,22 @@ import logging.config
 from typing import Dict, Any
 
 
-LOGGER: Any = None
 MODULE_DIR: str = os.path.dirname(os.path.abspath(__file__))
 CONFIG_FILE_PATH: str = os.path.join(MODULE_DIR, 'configs', 'langfetch.toml')
 
-def initialize_logger(log_configs: Dict[str, Any]) -> None:
-    global LOGGER
-    if LOGGER is None:
+def initialize_logger(logger_name: str, config_file_path: str = CONFIG_FILE_PATH) -> logging.Logger:
+    if not hasattr(initialize_logger, 'executed'):
         try:
-            logging.config.dictConfig(log_configs)
-            config_succeeded = True
+            with open(config_file_path, 'r', encoding='utf-8') as config_file:
+                configs: Dict[str, Any] = toml.loads(config_file.read())
+                logging_configs = configs['logging_configs']
+            logging.config.dictConfig(logging_configs)
         except Exception as e:
-            config_succeeded = False
-        LOGGER = logging.getLogger(__name__)
-        if not config_succeeded:
-            LOGGER.warning(f"Invalid logging configurations: {e}.") #type: ignore
-        try:
-            with open(log_configs['handlers']['fileHandler']['filename'], 'w', encoding='utf-8') as clean_file:
-                pass
-        except Exception:
-            pass
+            print(f"(Warning): Failed to load logging configurations: {e}.")
+        initialize_logger.executed = True #type: ignore
+    return logging.getLogger(logger_name)
+
+LOGGER: logging.Logger = initialize_logger(__name__)
 
 class LangFetcher:
     DEFAULT_ERROR_MESSAGE: str = "DEFAULT_ERROR_MESSAGE"
@@ -36,14 +32,12 @@ class LangFetcher:
             with open(config_file_path, 'r', encoding='utf-8') as config_file:
                 configs: Dict[str, Any] = toml.loads(config_file.read())
             self.raw_configs: Dict[str, Any] = configs
-            self.logging_configs: Dict[str, Any] = configs['logging_configs']
             self.supported: Dict[str, Any] = configs['supported']
             self.groups: Dict[str, Any] = configs['groups']
             self.lang: str = next(iter(self.supported.values()))
             assert self.lang is not None, 'No language supported.'
-            initialize_logger(self.logging_configs)
         except Exception as e:
-            print(f"An exception has occurred when reading from the config file: {e}.") #type: ignore
+            print(f"(Critical): An exception has occurred when reading from the config file: {e}.")
             sys.exit(1)
 
     def __call__(self, key: str, lang: str | None = None) -> str:
@@ -54,7 +48,7 @@ class LangFetcher:
                 lang = self.supported[lang]
             return self.groups[key][lang]
         except Exception as e:
-            LOGGER.error(f"An exception has occurred when fetching the text: {e}.") #type: ignore
+            LOGGER.error(f"An exception has occurred when fetching the text: {e}.")
             return LangFetcher.DEFAULT_ERROR_MESSAGE
         
     def set_lang(self, lang: str) -> None:
@@ -63,7 +57,7 @@ class LangFetcher:
         elif lang in self.supported.values():
             self.lang = lang
         else:
-            LOGGER.warning(f"Unsupported language: {lang}.") #type: ignore
+            LOGGER.warning(f"Unsupported language: {lang}.")
 
     def get_supported(self) -> Dict[str, str]:
         return self.supported
