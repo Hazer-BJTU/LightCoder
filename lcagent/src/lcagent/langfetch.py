@@ -4,7 +4,7 @@ import toml
 import logging
 import logging.config
 
-from typing import Dict, Any
+from typing import Dict, Any, Optional
 from pathlib import Path
 
 
@@ -44,7 +44,7 @@ class LangFetcher:
             print(f"(Critical): An exception has occurred when reading from the config file: {e}.")
             sys.exit(1)
 
-    def __call__(self, key: str, lang: str | None = None) -> str:
+    def __call__(self, key: str, lang: Optional[str] = None) -> str:
         try:
             if lang is None:
                 lang = self.lang
