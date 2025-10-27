@@ -1,2 +1,5 @@
-def main() -> None:
-    print("Hello from lcagent!")
+from .langfetch import langfetcher
+
+__all__ = [
+    'langfetcher'
+]
