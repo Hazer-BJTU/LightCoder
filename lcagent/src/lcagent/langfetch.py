@@ -5,6 +5,7 @@ import logging
 import logging.config
 
 from typing import Dict, Any
+from pathlib import Path
 
 
 MODULE_DIR: str = os.path.dirname(os.path.abspath(__file__))
@@ -16,12 +17,10 @@ def initialize_logger(logger_name: str, config_file_path: str = CONFIG_FILE_PATH
             with open(config_file_path, 'r', encoding='utf-8') as config_file:
                 configs: Dict[str, Any] = toml.loads(config_file.read())
                 logging_configs = configs['logging_configs']
+            logging_path = Path(logging_configs['handlers']['fileHandler']['filename'])
+            logging_path.parent.mkdir(parents=True, exist_ok=True)
+            logging_path.write_text('', encoding='utf-8')
             logging.config.dictConfig(logging_configs)
-            try:
-                with open(logging_configs['handlers']['fileHandler']['filename'], 'w', encoding='utf-8') as cleaned_file:
-                    pass
-            except Exception:
-                pass
         except Exception as e:
             print(f"(Warning): Failed to load logging configurations: {e}.")
         initialize_logger.executed = True #type: ignore
