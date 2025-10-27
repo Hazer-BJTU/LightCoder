@@ -16,10 +16,17 @@ def initialize_logger(log_configs: Dict[str, Any]) -> None:
     if LOGGER is None:
         try:
             logging.config.dictConfig(log_configs)
-            LOGGER = logging.getLogger(__name__)
+            config_succeeded = True
         except Exception as e:
-            LOGGER = logging.getLogger(__name__)
+            config_succeeded = False
+        LOGGER = logging.getLogger(__name__)
+        if not config_succeeded:
             LOGGER.warning(f"Invalid logging configurations: {e}.") #type: ignore
+        try:
+            with open(log_configs['handlers']['fileHandler']['filename'], 'w', encoding='utf-8') as clean_file:
+                pass
+        except Exception:
+            pass
 
 class LangFetcher:
     DEFAULT_ERROR_MESSAGE: str = "DEFAULT_ERROR_MESSAGE"
@@ -33,7 +40,7 @@ class LangFetcher:
             self.supported: Dict[str, Any] = configs['supported']
             self.groups: Dict[str, Any] = configs['groups']
             self.lang: str = next(iter(self.supported.values()))
-            assert self.lang is not None, 'No languages support.'
+            assert self.lang is not None, 'No language supported.'
             initialize_logger(self.logging_configs)
         except Exception as e:
             print(f"An exception has occurred when reading from the config file: {e}.") #type: ignore
@@ -43,6 +50,8 @@ class LangFetcher:
         try:
             if lang is None:
                 lang = self.lang
+            elif lang in self.supported:
+                lang = self.supported[lang]
             return self.groups[key][lang]
         except Exception as e:
             LOGGER.error(f"An exception has occurred when fetching the text: {e}.") #type: ignore
