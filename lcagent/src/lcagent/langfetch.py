@@ -17,6 +17,11 @@ def initialize_logger(logger_name: str, config_file_path: str = CONFIG_FILE_PATH
                 configs: Dict[str, Any] = toml.loads(config_file.read())
                 logging_configs = configs['logging_configs']
             logging.config.dictConfig(logging_configs)
+            try:
+                with open(logging_configs['handlers']['fileHandler']['filename'], 'w', encoding='utf-8') as cleaned_file:
+                    pass
+            except Exception:
+                pass
         except Exception as e:
             print(f"(Warning): Failed to load logging configurations: {e}.")
         initialize_logger.executed = True #type: ignore
