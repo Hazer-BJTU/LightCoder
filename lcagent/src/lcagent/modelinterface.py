@@ -1,4 +1,5 @@
 import os
+import sys
 import toml
 import copy
 
@@ -13,8 +14,12 @@ LOGGER = initialize_logger(__name__)
 
 API_POOL: Dict[str, Tuple[OpenAI, Dict]] = {}
 
-with open(CONFIG_FILE_PATH, 'r', encoding='utf-8') as config_file:
-    SUPPORTED_MODELS = toml.loads(config_file.read())
+try:
+    with open(CONFIG_FILE_PATH, 'r', encoding='utf-8') as config_file:
+        SUPPORTED_MODELS = toml.loads(config_file.read())
+except Exception as e:
+    LOGGER.critical(f'An error has occurred when reading from model configurations: {e}.')
+    sys.exit(1)
 
 def get_client(name: str) -> Tuple[Optional[OpenAI], Dict]:
     get_client.DEFAULT_ERROR_MESSAGE = (None, {'MODEL_NOT_SUPPORTED': True}) #type: ignore
