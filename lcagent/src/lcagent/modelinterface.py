@@ -30,6 +30,8 @@ def get_client(name: str) -> Tuple[Optional[OpenAI], Dict]:
             try:
                 model_configs: Dict = copy.deepcopy(SUPPORTED_MODELS[name])
                 api_default_configs = model_configs.pop('api_default_configs')
+                if len(model_configs) == 1:
+                    model_configs = next(iter(model_configs.values()))
                 base_url = api_default_configs['base-url']
                 if 'api-key' not in api_default_configs or api_default_configs['api-key'] == '<your api here>':
                     api_key = os.getenv(api_default_configs['api-key-env'])
