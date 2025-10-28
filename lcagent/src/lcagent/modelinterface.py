@@ -16,8 +16,8 @@ API_POOL: Dict[str, Tuple[OpenAI, Dict]] = {}
 with open(CONFIG_FILE_PATH, 'r', encoding='utf-8') as config_file:
     SUPPORTED_MODELS = toml.loads(config_file.read())
 
-def get_model_api(name: str) -> Tuple[Optional[OpenAI], Dict]:
-    get_model_api.DEFAULT_ERROR_MESSAGE = (None, {'MODEL_NOT_SUPPORTED': True}) #type: ignore
+def get_client(name: str) -> Tuple[Optional[OpenAI], Dict]:
+    get_client.DEFAULT_ERROR_MESSAGE = (None, {'MODEL_NOT_SUPPORTED': True}) #type: ignore
     if name in API_POOL:
         return API_POOL[name]
     else:
@@ -34,10 +34,10 @@ def get_model_api(name: str) -> Tuple[Optional[OpenAI], Dict]:
                 return API_POOL[name]
             except Exception as e:
                 LOGGER.warning(f'Unsupported model specified: {name} or an error has occurred: {e}.')
-                return get_model_api.DEFAULT_ERROR_MESSAGE #type: ignore
+                return get_client.DEFAULT_ERROR_MESSAGE #type: ignore
         else:
             LOGGER.warning(f'Unsupported model specified: {name}.')
-            return get_model_api.DEFAULT_ERROR_MESSAGE #type: ignore
+            return get_client.DEFAULT_ERROR_MESSAGE #type: ignore
         
 
 if __name__ == '__main__':
