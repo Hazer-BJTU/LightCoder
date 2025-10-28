@@ -1,0 +1,9 @@
+[deepseek-chat.api_default_configs]
+base-url = "https://api.deepseek.com"
+api-key = "<your api here>"
+api-key-env = "DEEPSEEK_API_KEY"
+
+[deepseek-chat.completion_default_configs]
+model = "deepseek-chat"
+max_tokens = 6000
+stream = false

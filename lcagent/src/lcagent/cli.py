@@ -10,7 +10,7 @@ from typing import Dict, Any, Callable
 from lcagent.langfetch import initialize_logger
 
 
-MODULE_DIR: str = os.path.dirname(os.path.abspath(__file__))
+MODULE_DIR: str = os.path.dirname(os.path.abspath(__name__))
 LOGGER = initialize_logger(__file__)
 CONSOLE = Console()
 

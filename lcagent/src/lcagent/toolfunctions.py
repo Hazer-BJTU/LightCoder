@@ -6,7 +6,7 @@ from typing import Dict, Callable, Optional, Literal, List, Tuple
 from lcagent.langfetch import initialize_logger
 
 
-LOGGER = initialize_logger(__file__)
+LOGGER = initialize_logger(__name__)
 
 def fetch_project_file_structure_function(
     project_base_dir: str = '.',
